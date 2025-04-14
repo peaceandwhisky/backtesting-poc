@@ -1,41 +1,41 @@
 # Backtesting POC
 
-BTCUSDTの価格データを使用したバックテスティングのPOC（Proof of Concept）プロジェクトです。
+A Proof of Concept (POC) project for backtesting trading strategies using BTCUSDT price data.
 
-## 機能
+## Features
 
-- Binanceから過去1年分のBTCUSDTの価格データを取得
-- 移動平均線（20日、50日、200日）を使用した簡単な取引戦略
-- バックテスト結果のインタラクティブなHTMLチャート生成
+- Fetches 1 year of BTCUSDT price data from Binance
+- Implements a simple trading strategy using moving averages (20, 50, and 200 days)
+- Generates interactive HTML charts for backtest results
 
-## 必要条件
+## Requirements
 
-- Python 3.10以上
-- 必要なパッケージは`requirements.txt`に記載
+- Python 3.10 or higher
+- Required packages are listed in `requirements.txt`
 
-## セットアップ
+## Setup
 
 ```bash
-# リポジトリのクローン
+# Clone the repository
 git clone https://github.com/yourusername/backtesting-poc.git
 cd backtesting-poc
 
-# 依存パッケージのインストール
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-## 使用方法
+## Usage
 
 ```bash
 python backtest_btc.py
 ```
 
-実行後、`backtest_results`ディレクトリに結果のHTMLファイルが生成されます。
+After execution, the results will be saved as an HTML file in the `backtest_results` directory.
 
-## バックテスト戦略
+## Backtesting Strategy
 
-現在の戦略は以下の条件で取引を行います：
+The current strategy trades based on the following conditions:
 
-1. 200日移動平均線を上回っている場合のみ取引（トレンドフィルター）
-2. 20日移動平均線が50日移動平均線を上抜けた場合に買い（ゴールデンクロス）
-3. 50日移動平均線が20日移動平均線を上抜けた場合に売り（デッドクロス） 
+1. Only trades when price is above the 200-day moving average (trend filter)
+2. Buys when the 20-day moving average crosses above the 50-day moving average (golden cross)
+3. Sells when the 50-day moving average crosses above the 20-day moving average (death cross) 

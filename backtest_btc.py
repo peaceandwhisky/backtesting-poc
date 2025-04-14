@@ -7,15 +7,15 @@ import os
 
 class SimpleStrategy(Strategy):
     def init(self):
-        # 移動平均線の計算
+        # Calculate moving averages
         self.sma20 = self.I(SMA, self.data.Close, 20)
         self.sma50 = self.I(SMA, self.data.Close, 50)
-        self.sma200 = self.I(SMA, self.data.Close, 200)  # 長期トレンドの確認用
+        self.sma200 = self.I(SMA, self.data.Close, 200)  # For long-term trend confirmation
 
     def next(self):
-        # 長期トレンドが上昇の場合のみ取引
+        # Only trade when long-term trend is bullish
         if self.data.Close[-1] > self.sma200[-1]:
-            # ゴールデンクロスで買い、デッドクロスで売り
+            # Buy on golden cross, sell on death cross
             if crossover(self.sma20, self.sma50):
                 self.buy()
             elif crossover(self.sma50, self.sma20):
@@ -25,14 +25,14 @@ def SMA(values, n):
     return pd.Series(values).rolling(n).mean()
 
 def fetch_ohlcv_data():
-    # Binanceからデータを取得
+    # Fetch data from Binance
     exchange = ccxt.binance()
     
-    # 過去1年分の日足データを取得
+    # Get 1 year of daily data
     since = int((datetime.now() - timedelta(days=365)).timestamp() * 1000)
     ohlcv = exchange.fetch_ohlcv('BTC/USDT', '1d', since=since)
     
-    # DataFrameに変換
+    # Convert to DataFrame
     df = pd.DataFrame(ohlcv, columns=['Timestamp', 'Open', 'High', 'Low', 'Close', 'Volume'])
     df['Timestamp'] = pd.to_datetime(df['Timestamp'], unit='ms')
     df.set_index('Timestamp', inplace=True)
@@ -40,41 +40,41 @@ def fetch_ohlcv_data():
     return df
 
 def main():
-    # データの取得
+    # Fetch data
     data = fetch_ohlcv_data()
     
-    # バックテストの実行
+    # Run backtest
     initial_cash = 1000000  # 1,000,000 USDT
     bt = Backtest(data, SimpleStrategy, commission=.002, cash=initial_cash)
     results = bt.run()
     
-    # 結果の表示
-    print("\n=== バックテスト結果 ===")
-    print(f"期間: {results['Start']} から {results['End']}")
-    print(f"リターン: {results['Return [%]']:.2f}%")
-    print(f"最大ドローダウン: {results['Max. Drawdown [%]']:.2f}%")
-    print(f"取引回数: {results['# Trades']}")
-    print(f"勝率: {results['Win Rate [%]']:.2f}%")
-    print(f"平均取引利益: {results['Avg. Trade [%]']:.2f}%")
-    print(f"シャープレシオ: {results['Sharpe Ratio']:.2f}")
+    # Display results
+    print("\n=== Backtest Results ===")
+    print(f"Period: {results['Start']} to {results['End']}")
+    print(f"Return: {results['Return [%]']:.2f}%")
+    print(f"Max Drawdown: {results['Max. Drawdown [%]']:.2f}%")
+    print(f"Number of Trades: {results['# Trades']}")
+    print(f"Win Rate: {results['Win Rate [%]']:.2f}%")
+    print(f"Average Trade: {results['Avg. Trade [%]']:.2f}%")
+    print(f"Sharpe Ratio: {results['Sharpe Ratio']:.2f}")
     
-    # 取引履歴の表示
-    print("\n=== 取引履歴 ===")
+    # Display trade history
+    print("\n=== Trade History ===")
     print(results._trades)
     
-    # HTMLチャートの保存
+    # Save HTML chart
     output_dir = 'backtest_results'
     os.makedirs(output_dir, exist_ok=True)
     output_file = os.path.join(output_dir, 'backtest_results.html')
     
-    # バックテストの結果をHTMLとして保存（バージョン0.2.0用の修正）
+    # Save backtest results as HTML (modified for version 0.2.0)
     try:
         bt.plot(filename=output_file)
-        print(f"\nインタラクティブなチャートを {output_file} に保存しました。")
-        print("このファイルをブラウザで開いて結果を確認してください。")
+        print(f"\nInteractive chart saved to {output_file}")
+        print("Please open this file in your browser to view the results.")
     except Exception as e:
-        print(f"プロットエラー: {e}")
-        print("テキストベースの結果を表示します:")
+        print(f"Plot error: {e}")
+        print("Displaying text-based results:")
         print(results._trades)
 
 if __name__ == '__main__':
